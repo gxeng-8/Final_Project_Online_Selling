@@ -31,11 +31,43 @@ const systemActor = 'bahinko';
 bool isNotificationFor(ActivityEvent e, String myId) =>
     e.forIds.contains(myId) && e.actorId.isNotEmpty && e.actorId != myId;
 
-/// Only my notifications, keeping the newest-first order.
+/// When I (last) joined each group, from my own "join" entry there.
+/// Groups I created have none, so nothing is hidden there.
+Map<String, DateTime> joinedAtByGroup(List<GroupEvent> all, String myId) {
+  final joined = <String, DateTime>{};
+  for (final item in all) {
+    final e = item.event;
+    final at = e.createdAt;
+    if (e.type != 'join' || e.actorId != myId || at == null) continue;
+    final prev = joined[item.group.id];
+    if (prev == null || at.isAfter(prev)) joined[item.group.id] = at;
+  }
+  return joined;
+}
+
+/// Drops what happened in a group BEFORE I joined it. Used by the bell and
+/// by Activity History, so a new member doesn't see the group's past.
+List<GroupEvent> sinceJoining(List<GroupEvent> all, String myId) {
+  final joinedAt = joinedAtByGroup(all, myId);
+  if (joinedAt.isEmpty) return all;
+  return [
+    for (final item in all)
+      if (!_beforeJoining(item, joinedAt)) item,
+  ];
+}
+
+/// Only my notifications, keeping the newest-first order (and nothing from
+/// before I joined the group).
 List<GroupEvent> notificationsFor(List<GroupEvent> all, String myId) => [
-  for (final item in all)
+  for (final item in sinceJoining(all, myId))
     if (isNotificationFor(item.event, myId)) item,
 ];
+
+bool _beforeJoining(GroupEvent item, Map<String, DateTime> joinedAt) {
+  final joined = joinedAt[item.group.id];
+  final at = item.event.createdAt;
+  return joined != null && at != null && at.isBefore(joined);
+}
 
 /// Newest first (entries still being saved count as "now").
 void sortNewestFirst(List<GroupEvent> list) => list.sort(
