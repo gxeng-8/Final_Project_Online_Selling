@@ -200,7 +200,8 @@ class _ReceiptCard extends StatelessWidget {
     final e = expense;
     final myId = GroupService.instance.myId;
     const mono = TextStyle(fontSize: 13, letterSpacing: 0.3);
-    final date = e.createdAt;
+    // The date picked on Add Expense (falls back to when it was saved).
+    final date = e.date;
     final subtitle = [
       group.name,
       if (date != null) '${_months[date.month - 1]} ${date.day}, ${date.year}',

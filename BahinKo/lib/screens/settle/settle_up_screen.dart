@@ -251,15 +251,24 @@ class _SettleUpState extends State<SettleUp> {
     }
   }
 
-  Future<void> _remind(Person from, Person me, int cents) async {
+  Future<void> _remind(
+    Person from,
+    Person me,
+    int cents,
+    String groupName,
+  ) async {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) =>
-          ReminderSheet(member: from, payer: me, amountInCents: cents),
+      builder: (_) => ReminderSheet(
+        member: from,
+        payer: me,
+        amountInCents: cents,
+        groupName: groupName,
+      ),
     );
     // Log it for the activity feed (Figma 20, "Reminders" filter).
     await GroupService.instance
@@ -345,7 +354,7 @@ class _SettleUpState extends State<SettleUp> {
           onConfirm: _confirmReceived,
           onRemind: (from, cents) {
             final me = ledger.group.memberById(_myId);
-            if (me != null) _remind(from, me, cents);
+            if (me != null) _remind(from, me, cents, ledger.group.name);
           },
         );
       },

@@ -26,11 +26,15 @@ class ReminderSheet extends StatefulWidget {
     required this.member,
     required this.payer,
     required this.amountInCents,
+    required this.groupName,
   });
 
   final Person member;
   final Person payer;
   final int amountInCents;
+
+  /// The group this reminder is about, shown under the member's name.
+  final String groupName;
 
   @override
   State<ReminderSheet> createState() => _ReminderSheetState();
@@ -91,7 +95,7 @@ class _ReminderSheetState extends State<ReminderSheet> {
                       style: const TextStyle(fontWeight: FontWeight.w800),
                     ),
                     Text(
-                      'Dinner at Jaro · ${formatCurrency(widget.amountInCents)}',
+                      '${widget.groupName} · ${formatMoney(widget.amountInCents)}',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.black54,

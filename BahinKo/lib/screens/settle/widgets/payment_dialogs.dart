@@ -61,7 +61,7 @@ class PaymentOpeningDialog extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            formatCurrency(amountInCents),
+            formatMoney(amountInCents),
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 20),
@@ -124,7 +124,7 @@ class PaymentConfirmationDialog extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            formatCurrency(amountInCents),
+            formatMoney(amountInCents),
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 20),

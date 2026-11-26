@@ -90,7 +90,11 @@ Future<Uint8List> buildReportPdf(GroupReport r) {
           r.groupName,
           style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
         ),
-        pw.Text(r.subtitle, style: const pw.TextStyle(color: _muted)),
+        // Helvetica has no en dash, so use a plain hyphen in the PDF.
+        pw.Text(
+          r.subtitle.replaceAll('\u2013', '-'),
+          style: const pw.TextStyle(color: _muted),
+        ),
         pw.SizedBox(height: 14),
         pw.Table(
           columnWidths: const {
