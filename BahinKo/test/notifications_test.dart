@@ -71,6 +71,35 @@ void main() {
       expect(isNotificationFor(e('', ['me']), 'me'), isFalse); // old entry
     });
 
+    test('what happened before I joined a group is not news', () {
+      final g = Group(
+        id: 'g1',
+        name: 'Dinner at Jaro',
+        category: categoryNamed('Dinner'),
+        members: const [],
+        inviteCode: 'ABC123',
+      );
+      ActivityEvent at(String type, String actor, DateTime when) =>
+          ActivityEvent(
+            type: type,
+            text: '',
+            actorId: actor,
+            forIds: const ['me'],
+            createdAt: when,
+          );
+      final joined = DateTime(2026, 11, 20, 12);
+      final all = <GroupEvent>[
+        (group: g, event: at('expense', 'jun', DateTime(2026, 11, 21))),
+        (group: g, event: at('join', 'me', joined)),
+        (group: g, event: at('expense', 'jun', DateTime(2026, 11, 10))),
+      ];
+      final mine = notificationsFor(all, 'me');
+      expect(mine.length, 1);
+      expect(mine.single.event.createdAt, DateTime(2026, 11, 21));
+      // History uses the same cutoff and keeps the join entry itself.
+      expect(sinceJoining(all, 'me').length, 2);
+    });
+
     test('badge counts up to 9, then shows 9+', () {
       expect(badgeLabel(0), isNull);
       expect(badgeLabel(1), '1');

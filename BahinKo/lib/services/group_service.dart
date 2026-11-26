@@ -194,8 +194,7 @@ abstract class GroupService {
                 waiting.remove(g.id);
                 emit();
               },
-              onError: (_) {
-                // One broken group shouldn't hide the others.
+              onError: (Object error) {
                 waiting.remove(g.id);
                 emit();
               },
@@ -242,7 +241,8 @@ abstract class GroupService {
             a.event.createdAt ?? DateTime.now(),
           ),
         );
-        return all;
+        // A new member doesn't see what happened before they joined.
+        return sinceJoining(all, myId);
       });
 
   /// The bell, newest first (see utils/notifications.dart):
